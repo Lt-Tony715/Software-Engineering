@@ -6,6 +6,8 @@
 class GlobalData
 {
 public:
+    GlobalData() ;
+    ~GlobalData() ;
     static VideoInformation vi ;
 
 };

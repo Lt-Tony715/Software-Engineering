@@ -1,4 +1,12 @@
 #include "globaldata.h"
 
-VideoInformation temp ;
-VideoInformation GlobalData::vi = temp ;
+GlobalData::GlobalData()
+{
+    VideoInformation temp ;
+    VideoInformation vi = temp ;
+}
+GlobalData::~GlobalData()
+{
+
+}
+
