@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
         savePlayList();
     });
 
-    QVideoWidget* videoWidget = new QVideoWidget(this);
+    videoWidget = new QVideoWidget(this);
     ui->playWidgetLayout->addWidget(videoWidget);
 
     m_mediaPlayer = new QMediaPlayer(this);
@@ -57,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent)
     m_mediaPlayList = new QMediaPlaylist(this);
     m_mediaPlayer->setPlaylist(m_mediaPlayList);
 
+//    connect(videoWidget, &QVideoWidget::customContextMenuRequested, this, [this](const QPoint &pos){
+//        c1->exec(ui->playList->mapToGlobal(pos));
+//    }) ;
     connect(m_mediaPlayer, &QMediaPlayer::stateChanged, this, [this](QMediaPlayer::State newState) {
         if (newState == QMediaPlayer::PlayingState)
         {
@@ -74,6 +77,14 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, [this](qint64 duration) {
+        int index = m_mediaPlayList->currentIndex() ;
+        QString name = ui->playList->item(index)->text();
+        QString s_temp = m_ulrMap[name] ;
+        s_temp.remove(0, 8) ;
+        //qDebug()<<s_temp<<endl ;
+        GlobalData::vi.getVideoInfo(s_temp) ;
+        //qDebug()<<GlobalData::vi.getFrameRate()<<endl ;
+        //GlobalData::vi.getVideoInfo(m_mediaPlayer)
         ui->playPosSlider->setMaximum(duration);
         ui->playPosSlider->setValue(0);
     });
@@ -131,11 +142,6 @@ void MainWindow::on_playList_doubleClicked(const QModelIndex &index)
         }
         return ;
     }
-//    QString s_temp = m_ulrMap[name] ;
-//    s_temp.remove(0, 8) ;
-//    //qDebug()<<s_temp<<endl ;
-//    GlobalData::vi.getVideoInfo(s_temp) ;
-//    qDebug()<<GlobalData::vi.getFrameRate()<<endl ;
     m_mediaPlayList->setCurrentIndex(index.row());
 
     QTimer::singleShot(800, this, [this](){
@@ -144,17 +150,7 @@ void MainWindow::on_playList_doubleClicked(const QModelIndex &index)
 }
 void MainWindow::on_listButton_clicked()
 {
-    if(ui->playList->isVisible()==true)
-    {
-        ui->playList->setVisible(false);
-        ui->listButton->setText("展开");
-
-    }
-    else
-    {
-        ui->playList->setVisible(true);
-        ui->listButton->setText("隐藏");
-    }
+    HideAndExpandPlayList() ;
 }
 void MainWindow::on_playOrPauseButton_clicked()
 {
@@ -195,6 +191,7 @@ void MainWindow::on_playList_customContextMenuRequested(const QPoint &pos)
 {
     contenxMenu->exec(ui->playList->mapToGlobal(pos));
 }
+
 
 void MainWindow::updatePlayText(bool play)
 {
@@ -268,19 +265,7 @@ void MainWindow::savePlayList()
 
 void MainWindow::on_forwardButton_clicked()
 {
-    int value = ui->playPosSlider->value() ;
-    QList<QListWidgetItem*> temp = ui->playList->selectedItems() ;
-    if(temp.size() <= 0){
-        return ;
-    }
-//    QString name = ui->playList->selectedItems()[0]->text() ;
-//    QString s_temp = m_ulrMap[name] ;
-//    s_temp.remove(0, 8) ;
-//    qDebug()<<s_temp<<endl ;
-//    GlobalData::vi.getVideoInfo(s_temp) ;
-//    qDebug()<<GlobalData::vi.getFrameRate()<<endl ;
-    int m_unit = m_mediaPlayer->notifyInterval() ;
-    m_mediaPlayer->setPosition(value+m_unit);
+    this->Fast_forward_five_frame() ;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -295,18 +280,107 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
         if(event->key() == Qt::Key_M)
         {
-            if(ui->playList->isVisible()==true)
-            {
-                ui->playList->setVisible(false);
-                ui->listButton->setText("展开");
-
-            }
-            else
-            {
-                ui->playList->setVisible(true);
-                ui->listButton->setText("隐藏");
-            }
+            HideAndExpandPlayList() ;
         }
+        if(event->key() == Qt::Key_Up)
+        {
+            VolumeUp()  ;
+        }
+        if(event->key() == Qt::Key_Down)
+        {
+            VolumeDown()  ;
+        }
+        if(event->key() == Qt::Key_P)
+        {
+            this->Fast_forward_five_frame() ;
+        }
+        if(event->key() == Qt::Key_Q)
+        {
+            this->Fast_forward_one_frame() ;
+        }
+    }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::RightButton)
+    {
+        c1 = new QMenu(this) ;
+        c1->addAction(new QAction("视频信息", this)) ;
+        //QString Info_name="文件名：";
+        //Info_name+=GlobalData::vi.
+        //QString Info_bit_rate="比特率：";
+        //Info_bit_rate+=GlobalData::vi.
+        //QString Info_codec="编解码器：";
+        //Info_codec+=VideoVector[FindAudioOrVideoByName(filename)].codec;
+
+        QString Info_frame_rate="帧率：";
+        Info_frame_rate+=QString::number(GlobalData::vi.getFrameRate()) ;
+        //QString Info_resolution="分辨率：";
+        //Info_resolution+=VideoVector[FindAudioOrVideoByName(filename)].resolution;
+
+        //ContextMenu->addAction(new QAction(Info_name,this));
+        //ContextMenu->addAction(new QAction(Info_resolution,this));
+        c1->addAction(new QAction(Info_frame_rate,this));
+        //ContextMenu->addAction(new QAction(Info_bit_rate,this));
+        //ContextMenu->addAction(new QAction(Info_codec,this));
+
+        c1->exec(event->globalPos());
+    }
+}
+
+void MainWindow::HideAndExpandPlayList()
+{
+    if(ui->playList->isVisible()==true)
+    {
+        ui->playList->setVisible(false);
+        ui->listButton->setText("展开");
 
     }
+    else
+    {
+        ui->playList->setVisible(true);
+        ui->listButton->setText("隐藏");
+    }
+}
+
+void MainWindow::VolumeUp()
+{
+    int value = ui->VolumeSlider->value() ;
+    value=value+5>99?99:value+5  ;
+    ui->VolumeSlider->setValue(value)  ;
+    m_mediaPlayer->setVolume(value)  ;
+}
+
+void MainWindow::VolumeDown()
+{
+    int value = ui->VolumeSlider->value() ;
+    value=value-5<0?0:value-5  ;
+    ui->VolumeSlider->setValue(value)  ;
+    m_mediaPlayer->setVolume(value)  ;
+}
+
+void MainWindow::on_VolumeSlider_sliderMoved(int position)
+{
+    m_mediaPlayer->setVolume(position);
+}
+
+void MainWindow::Fast_forward_one_frame()
+{
+    m_mediaPlayer->pause() ;
+    qint64 ps = m_mediaPlayer->position()+1000/GlobalData::vi.getFrameRate() ;
+    while(m_mediaPlayer->position() < ps){
+        m_mediaPlayer->play() ;
+    }
+    m_mediaPlayer->pause();
+}
+
+void MainWindow::Fast_forward_five_frame()
+{
+    m_mediaPlayer->pause() ;
+    qint64 ps = m_mediaPlayer->position()+5000/GlobalData::vi.getFrameRate() ;
+    while(m_mediaPlayer->position() < ps){
+        m_mediaPlayer->play() ;
+    }
+    m_mediaPlayer->pause();
 }

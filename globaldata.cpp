@@ -1,5 +1,5 @@
 #include "globaldata.h"
-
+VideoInformation GlobalData::vi ;
 GlobalData::GlobalData()
 {
     VideoInformation temp ;

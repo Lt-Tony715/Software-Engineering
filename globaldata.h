@@ -9,7 +9,6 @@ public:
     GlobalData() ;
     ~GlobalData() ;
     static VideoInformation vi ;
-
 };
 
 #endif // GLOBALDATA_H
