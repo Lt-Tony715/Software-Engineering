@@ -5,7 +5,6 @@
 #include <QMainWindow>
 #include <QMap>
 #include"videoinformation.h"
-#include"myvideowidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -86,7 +85,7 @@ private:
 
 private:
     QMediaPlayer* m_mediaPlayer = nullptr;
-    myvideowidget* videoWidget = nullptr ;
+    QVideoWidget* videoWidget = nullptr ;
     QMediaPlaylist* m_mediaPlayList = nullptr;
 
     QStringList m_nameList;

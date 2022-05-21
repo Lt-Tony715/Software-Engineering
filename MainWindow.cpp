@@ -20,7 +20,6 @@
 #include <QKeyEvent>
 #include<videoinformation.h>
 #include"globaldata.h"
-#include"myvideowidget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -49,8 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
         savePlayList();
     });
 
-    //videoWidget = new QVideoWidget(this);
-    videoWidget = new myvideowidget(this) ;
+    videoWidget = new QVideoWidget(this);
+    //videoWidget = new myvideowidget(this) ;
     ui->playWidgetLayout->addWidget(videoWidget);
 
     m_mediaPlayer = new QMediaPlayer(this);
