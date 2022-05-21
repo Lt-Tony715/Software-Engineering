@@ -20,6 +20,7 @@
 #include <QKeyEvent>
 #include<videoinformation.h>
 #include"globaldata.h"
+#include"myvideowidget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -48,7 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
         savePlayList();
     });
 
-    videoWidget = new QVideoWidget(this);
+    //videoWidget = new QVideoWidget(this);
+    videoWidget = new myvideowidget(this) ;
     ui->playWidgetLayout->addWidget(videoWidget);
 
     m_mediaPlayer = new QMediaPlayer(this);
@@ -56,7 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_mediaPlayList = new QMediaPlaylist(this);
     m_mediaPlayer->setPlaylist(m_mediaPlayList);
-
+    m_mediaPlayList->setPlaybackMode(QMediaPlaylist::Loop);
+    m_mediaPlayer->setPlaybackRate(qreal(1));
 //    connect(videoWidget, &QVideoWidget::customContextMenuRequested, this, [this](const QPoint &pos){
 //        c1->exec(ui->playList->mapToGlobal(pos));
 //    }) ;
@@ -80,9 +83,8 @@ MainWindow::MainWindow(QWidget *parent)
         int index = m_mediaPlayList->currentIndex() ;
         QString name = ui->playList->item(index)->text();
         QString s_temp = m_ulrMap[name] ;
-        s_temp.remove(0, 8) ;
-        //qDebug()<<s_temp<<endl ;
         GlobalData::vi.getVideoInfo(s_temp) ;
+        //GlobalData::vi.test1() ;
         //qDebug()<<GlobalData::vi.getFrameRate()<<endl ;
         //GlobalData::vi.getVideoInfo(m_mediaPlayer)
         ui->playPosSlider->setMaximum(duration);
@@ -93,6 +95,13 @@ MainWindow::MainWindow(QWidget *parent)
         Q_UNUSED(error)
         ui->statusbar->showMessage(m_mediaPlayer->errorString());
     });
+
+    //自定义的信号costomSliderClicked()
+    connect(ui->playPosSlider,SIGNAL(costomSliderClicked()),this,SLOT(sliderClicked()));
+
+    connect(ui->VolumeSlider, SIGNAL(costomSliderClicked()), this, SLOT(volume_slider_clicker())) ;
+
+    connect(ui->playPosSlider, SIGNAL(painte()), this, SLOT(paint_image())) ;
 
     updatePlayText(true);
     loadPlayList();
@@ -108,7 +117,7 @@ void MainWindow::on_actionOpenLocalFile_triggered()
    QString path = QFileDialog::getOpenFileName();
    qDebug()<<path<<endl ;
    QFileInfo fileInfo(path);
-   QString url = QUrl::fromLocalFile(fileInfo.absoluteFilePath()).toString();
+   QString url = fileInfo.absoluteFilePath();
    QString fileName = fileInfo.fileName();
 
    ui->playList->addItem(fileName);
@@ -130,6 +139,7 @@ void MainWindow::on_playList_doubleClicked(const QModelIndex &index)
         return ;
     }
     QString name = ui->playList->item(index.row())->text();
+    //qDebug()<<name<<endl ;
     if (!m_ulrMap.contains(name))
     {
         ui->statusbar->showMessage("播放失败，没有对应的ulr地址");
@@ -148,10 +158,12 @@ void MainWindow::on_playList_doubleClicked(const QModelIndex &index)
         m_mediaPlayer->play();
     });
 }
+
 void MainWindow::on_listButton_clicked()
 {
     HideAndExpandPlayList() ;
 }
+
 void MainWindow::on_playOrPauseButton_clicked()
 {
     if (m_mediaPlayer->state() != QMediaPlayer::PlayingState)
@@ -170,6 +182,30 @@ void MainWindow::on_playOrPauseButton_clicked()
 void MainWindow::on_stopButton_clicked()
 {
     m_mediaPlayer->stop();
+}
+
+void MainWindow::on_PreButton_clicked()
+{
+    if(m_mediaPlayList->currentIndex()==0)
+    {
+        m_mediaPlayList->setCurrentIndex(m_mediaPlayList->mediaCount()-1);
+        m_mediaPlayer->play();
+        return ;
+    }
+    m_mediaPlayList->previous();
+    m_mediaPlayer->play();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    if(m_mediaPlayList->currentIndex()==m_mediaPlayList->mediaCount()-1)
+    {
+        m_mediaPlayList->setCurrentIndex(0);
+        m_mediaPlayer->play();
+        return ;
+    }
+    m_mediaPlayList->next();
+    m_mediaPlayer->play();
 }
 
 void MainWindow::on_playPosSlider_sliderPressed()
@@ -192,6 +228,60 @@ void MainWindow::on_playList_customContextMenuRequested(const QPoint &pos)
     contenxMenu->exec(ui->playList->mapToGlobal(pos));
 }
 
+
+void MainWindow::on_PlayModeButton_clicked()
+{
+    if(m_mediaPlayList->playbackMode()==QMediaPlaylist::Loop)
+    {
+        m_mediaPlayList->setPlaybackMode(QMediaPlaylist::Random);
+        ui->PlayModeButton->setText("列表随机");
+    }
+    else if(m_mediaPlayList->playbackMode()==QMediaPlaylist::Random)
+    {
+        m_mediaPlayList->setPlaybackMode(QMediaPlaylist::Sequential);
+        ui->PlayModeButton->setText("列表顺序");
+    }
+    else if(m_mediaPlayList->playbackMode()==QMediaPlaylist::Sequential)
+    {
+        m_mediaPlayList->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+        ui->PlayModeButton->setText("单曲循环");
+    }
+    else if(m_mediaPlayList->playbackMode()==QMediaPlaylist::CurrentItemInLoop)
+    {
+        m_mediaPlayList->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+        ui->PlayModeButton->setText("单曲播放");
+    }
+    else if(m_mediaPlayList->playbackMode()==QMediaPlaylist::CurrentItemOnce)
+    {
+        m_mediaPlayList->setPlaybackMode(QMediaPlaylist::Loop);
+        ui->PlayModeButton->setText("列表循环");
+    }
+}
+
+void MainWindow::on_SpeedButton_clicked()
+{
+    qDebug()<<m_mediaPlayer->playbackRate()<<endl;
+    if(m_mediaPlayer->playbackRate()==qreal(1))
+    {
+        m_mediaPlayer->setPlaybackRate(qreal(2));
+        ui->SpeedButton->setText("x2");
+    }
+    else if(m_mediaPlayer->playbackRate()==qreal(2))
+    {
+        m_mediaPlayer->setPlaybackRate(qreal(4));
+        ui->SpeedButton->setText("x4");
+    }
+    else if(m_mediaPlayer->playbackRate()==qreal(4))
+    {
+        m_mediaPlayer->setPlaybackRate(qreal(0.5));
+        ui->SpeedButton->setText("x0.5");
+    }
+    else if(m_mediaPlayer->playbackRate()==qreal(0.5))
+    {
+        m_mediaPlayer->setPlaybackRate(qreal(1));
+        ui->SpeedButton->setText("x1");
+    }
+}
 
 void MainWindow::updatePlayText(bool play)
 {
@@ -228,6 +318,11 @@ void MainWindow::loadPlayList()
         QJsonObject jsonObject = value.toObject();
         QString name = jsonObject.value("name").toString();
         QString url = jsonObject.value("url").toString();
+//        qDebug()<<url<<endl ;
+//        QFile f(url);
+//        if(!f.exists()){
+//            continue ;
+//        }
         m_nameList.append(name);
         m_ulrMap[name] = url;
         m_mediaPlayList->addMedia(QMediaContent(url));
@@ -298,6 +393,32 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         {
             this->Fast_forward_one_frame() ;
         }
+        if(event->key() == Qt::Key_L)
+        {
+            this->HideAndExpandLayout() ;
+        }
+        if(event->key() == Qt::Key_Left)
+        {
+            if(m_mediaPlayList->currentIndex()==0)
+            {
+                m_mediaPlayList->setCurrentIndex(m_mediaPlayList->mediaCount()-1);
+                m_mediaPlayer->play();
+                return ;
+            }
+            m_mediaPlayList->previous();
+            m_mediaPlayer->play();
+        }
+        if(event->key() == Qt::Key_Right)
+        {
+            if(m_mediaPlayList->currentIndex()==m_mediaPlayList->mediaCount()-1)
+            {
+                m_mediaPlayList->setCurrentIndex(0);
+                m_mediaPlayer->play();
+                return ;
+            }
+            m_mediaPlayList->next();
+            m_mediaPlayer->play();
+        }
     }
 }
 
@@ -306,24 +427,46 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     if(event->buttons() == Qt::RightButton)
     {
         c1 = new QMenu(this) ;
-        c1->addAction(new QAction("视频信息", this)) ;
-        //QString Info_name="文件名：";
-        //Info_name+=GlobalData::vi.
-        //QString Info_bit_rate="比特率：";
-        //Info_bit_rate+=GlobalData::vi.
-        //QString Info_codec="编解码器：";
-        //Info_codec+=VideoVector[FindAudioOrVideoByName(filename)].codec;
+        if(GlobalData::vi.r_flag()){
+            c1->addAction(new QAction("视频信息", this)) ;
+            QString Info_name="文件路径：";
+            Info_name+=GlobalData::vi.getname() ;
+            QString Info_bit_rate="码率：";
+            Info_bit_rate+=QString::number(GlobalData::vi.getVideoAverageBitRate()) ;
+            //QString Info_codec="编解码器：";
+            //Info_codec+=VideoVector[FindAudioOrVideoByName(filename)].codec;
 
-        QString Info_frame_rate="帧率：";
-        Info_frame_rate+=QString::number(GlobalData::vi.getFrameRate()) ;
-        //QString Info_resolution="分辨率：";
-        //Info_resolution+=VideoVector[FindAudioOrVideoByName(filename)].resolution;
+            QString Info_frame_rate="帧率：";
+            Info_frame_rate+=QString::number(GlobalData::vi.getFrameRate()) ;
+            QString Info_resolution="分辨率：";
+            Info_resolution+=QString::number(GlobalData::vi.getWidth()) ;
+            Info_resolution+="*" ;
+            Info_resolution+=QString::number(GlobalData::vi.getHeight()) ;
 
-        //ContextMenu->addAction(new QAction(Info_name,this));
-        //ContextMenu->addAction(new QAction(Info_resolution,this));
-        c1->addAction(new QAction(Info_frame_rate,this));
-        //ContextMenu->addAction(new QAction(Info_bit_rate,this));
-        //ContextMenu->addAction(new QAction(Info_codec,this));
+            c1->addAction(new QAction(Info_name,this));
+            c1->addAction(new QAction(Info_resolution,this));
+            c1->addAction(new QAction(Info_frame_rate,this));
+            c1->addAction(new QAction(Info_bit_rate,this));
+            //ContextMenu->addAction(new QAction(Info_codec,this));
+        }
+        else {
+            c1->addAction(new QAction("音频信息", this)) ;
+            QString Info_name="文件路径：";
+            Info_name+=GlobalData::vi.getname() ;
+            QString info_bit_rate = "码率： " ;
+            info_bit_rate+=QString::number(GlobalData::vi.getAudioAverageBitRate()) ;
+            QString info_format = "编码格式: " ;
+            info_format+=GlobalData::vi.getAudioFormat() ;
+            QString info_s_number = "声道数： " ;
+            info_s_number+=QString::number(GlobalData::vi.getChannelNumbers()) ;
+
+
+            c1->addAction(new QAction(Info_name,this));
+            c1->addAction(new QAction(info_bit_rate,this));
+            c1->addAction(new QAction(info_format,this));
+            c1->addAction(new QAction(info_s_number,this));
+        }
+
 
         c1->exec(event->globalPos());
     }
@@ -341,6 +484,40 @@ void MainWindow::HideAndExpandPlayList()
     {
         ui->playList->setVisible(true);
         ui->listButton->setText("隐藏");
+    }
+}
+
+void MainWindow::HideAndExpandLayout()
+{
+    if(ui->playPosSlider->isVisible()==true)
+    {
+        ui->playPosSlider->setVisible(false);
+        ui->VolumeSlider->setVisible(false);
+        ui->forwardButton->setVisible(false);
+        ui->label->setVisible(false);
+        ui->listButton->setVisible(false);
+        ui->playOrPauseButton->setVisible(false);
+        ui->stopButton->setVisible(false);
+        ui->playPosLable->setVisible(false);
+        ui->PlayModeButton->setVisible(false);
+        ui->pushButton->setVisible(false);
+        ui->SpeedButton->setVisible(false);
+        ui->PreButton->setVisible(false);
+    }
+    else
+    {
+        ui->playPosSlider->setVisible(true);
+        ui->VolumeSlider->setVisible(true);
+        ui->forwardButton->setVisible(true);
+        ui->label->setVisible(true);
+        ui->listButton->setVisible(true);
+        ui->playOrPauseButton->setVisible(true);
+        ui->stopButton->setVisible(true);
+        ui->playPosLable->setVisible(true);
+        ui->PlayModeButton->setVisible(true);
+        ui->pushButton->setVisible(true);
+        ui->SpeedButton->setVisible(true);
+        ui->PreButton->setVisible(true);
     }
 }
 
@@ -384,3 +561,40 @@ void MainWindow::Fast_forward_five_frame()
     }
     m_mediaPlayer->pause();
 }
+
+/*
+* slider点击事件发生后，改变视频的进度
+*/
+void MainWindow::sliderClicked(){
+    m_mediaPlayer->setPosition(ui->playPosSlider->value());
+}
+
+void MainWindow::volume_slider_clicker(){
+    m_mediaPlayer->setVolume(ui->VolumeSlider->value())  ;
+}
+
+void MainWindow::paint_image()
+{
+    //repaint() ;
+    qDebug()<<"i am here"<<endl ;
+    videoWidget->update() ;
+}
+//void MainWindow::paintEvent(QPaintEvent *event)
+//{
+//    QPainter painter(this);
+//    QPixmap Qpix ;
+//    Qpix.load("D:\\finall\\bin\\1.jpg") ;
+//    Qpix = Qpix.scaled(300, 300, Qt::KeepAspectRatio);
+//    painter.drawPixmap(GlobalData::qp.rx(), GlobalData::qp.ry()+300, Qpix);
+
+//}
+
+
+
+
+
+
+
+
+
+

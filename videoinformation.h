@@ -3,12 +3,14 @@
 
 #include<QString>
 #include<iostream>
+#include<QFileInfo>
 extern "C"
 {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 #include "libswscale/swscale.h"
 #include "libavdevice/avdevice.h"
+#include "libavutil/imgutils.h"
 }
 class VideoInformation
 {
@@ -102,6 +104,12 @@ public:
     //@birth: created by LucasNan on 20210219
     float getAudioSize();
 
+    void test1() ;
+
+    bool r_flag() ;
+
+    QString getname() ;
+
 private:
     AVFormatContext* input_AVFormat_context_;
 
@@ -117,6 +125,7 @@ private:
     //(1) 总体
     QString format_;            //格式
     QString duration_;                //时长
+    QString name ;
 
 
     //(2) 对于视频
@@ -141,6 +150,8 @@ private:
     int sample_rate_;               //采样率
 
     float audio_size_;              //音频流大小
+
+    bool flag ;
 
 };
 #endif // VIDEOINFORMATION_H

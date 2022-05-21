@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>824</width>
-    <height>600</height>
+    <width>935</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,12 @@
    <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0" columnstretch="1,0">
     <item row="0" column="1" rowspan="2">
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>11</number>
+      </property>
       <item>
        <widget class="QListWidget" name="playList"/>
       </item>
@@ -48,8 +54,11 @@
     </item>
     <item row="1" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QSlider" name="playPosSlider">
+       <widget class="myslider" name="playPosSlider">
         <property name="maximum">
          <number>0</number>
         </property>
@@ -69,10 +78,20 @@
     </item>
     <item row="2" column="0" colspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="PreButton">
+        <property name="text">
+         <string>上一首</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="playOrPauseButton">
         <property name="text">
-         <string>播放/暂停</string>
+         <string>播放</string>
         </property>
        </widget>
       </item>
@@ -84,6 +103,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>下一首</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="forwardButton">
         <property name="text">
          <string>快进</string>
@@ -91,9 +117,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="rewindButton">
+       <widget class="QPushButton" name="PlayModeButton">
         <property name="text">
-         <string>快退</string>
+         <string>列表循环</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="SpeedButton">
+        <property name="text">
+         <string>x1</string>
         </property>
        </widget>
       </item>
@@ -112,7 +145,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSlider" name="VolumeSlider">
+       <widget class="myslider" name="VolumeSlider">
         <property name="singleStep">
          <number>5</number>
         </property>
@@ -149,8 +182,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>824</width>
-     <height>17</height>
+     <width>935</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -173,6 +206,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>myslider</class>
+   <extends>QSlider</extends>
+   <header location="global">myslider.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

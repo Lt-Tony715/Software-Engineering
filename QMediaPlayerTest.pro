@@ -24,12 +24,14 @@ SOURCES += \
     main.cpp \
     MainWindow.cpp \
     videoinformation.cpp \
-    globaldata.cpp
+    globaldata.cpp \
+    myslider.cpp
 
 HEADERS += \
     MainWindow.h \
     videoinformation.h \
-    globaldata.h
+    globaldata.h \
+    myslider.h
 
 FORMS += \
     MainWindow.ui

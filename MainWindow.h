@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QMap>
 #include"videoinformation.h"
+#include"myvideowidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,6 +47,24 @@ private slots:
 
     void on_VolumeSlider_sliderMoved(int position);
 
+    void sliderClicked();
+
+    void volume_slider_clicker() ;
+
+    void paint_image() ;
+
+
+
+
+
+
+    void on_PlayModeButton_clicked();
+
+    void on_pushButton_clicked();
+
+    void on_SpeedButton_clicked();
+
+    void on_PreButton_clicked();
 
 private:
     void updatePlayText(bool play = true);
@@ -61,10 +80,13 @@ private:
     void Fast_forward_one_frame() ;
     void Fast_forward_five_frame() ;
     void mousePressEvent(QMouseEvent * event) ;
+    void HideAndExpandLayout();
+//    void paintEvent(QPaintEvent *event) ;
+
 
 private:
     QMediaPlayer* m_mediaPlayer = nullptr;
-    QVideoWidget* videoWidget = nullptr ;
+    myvideowidget* videoWidget = nullptr ;
     QMediaPlaylist* m_mediaPlayList = nullptr;
 
     QStringList m_nameList;
