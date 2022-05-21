@@ -18,6 +18,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QKeyEvent>
+#include<QMimeData>
 #include<videoinformation.h>
 #include"globaldata.h"
 
@@ -27,9 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setAcceptDrops(true); //启动拖动事件
     ui->playList->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->playPosSlider->setMaximum(5) ;
     ui->playPosSlider->setTracking(true);
+    ui->VolumeSlider->setVisible(false);
     contenxMenu = new QMenu(this);
     contenxMenu->addAction("删除...", this, [this](){
         int pos = ui->playList->currentRow();
@@ -79,6 +82,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, [this](qint64 duration) {
+        if(m_mediaPlayList->currentIndex() == -1){
+            return ;
+        }
         int index = m_mediaPlayList->currentIndex() ;
         QString name = ui->playList->item(index)->text();
         QString s_temp = m_ulrMap[name] ;
@@ -287,6 +293,24 @@ void MainWindow::updatePlayText(bool play)
     ui->playOrPauseButton->setText(play ? "播放" : "暂停");
 }
 
+void MainWindow::on_VolumeSlider_sliderReleased()
+{
+    ui->VolumeSlider->setVisible(false);
+}
+
+
+void MainWindow::on_VolumeButton_clicked()
+{
+    if(ui->VolumeSlider->isVisible())
+    {
+        ui->VolumeSlider->setVisible(false);
+    }else
+    {
+        ui->VolumeSlider->setVisible(true);
+    }
+
+}
+
 void MainWindow::updateDiplayPosInfo()
 {
     auto convertDispalyStr = [](int totalMilliseconds) -> QString {
@@ -493,7 +517,7 @@ void MainWindow::HideAndExpandLayout()
         ui->playPosSlider->setVisible(false);
         ui->VolumeSlider->setVisible(false);
         ui->forwardButton->setVisible(false);
-        ui->label->setVisible(false);
+        ui->VolumeButton->setVisible(false);
         ui->listButton->setVisible(false);
         ui->playOrPauseButton->setVisible(false);
         ui->stopButton->setVisible(false);
@@ -508,7 +532,7 @@ void MainWindow::HideAndExpandLayout()
         ui->playPosSlider->setVisible(true);
         ui->VolumeSlider->setVisible(true);
         ui->forwardButton->setVisible(true);
-        ui->label->setVisible(true);
+        ui->VolumeButton->setVisible(true);
         ui->listButton->setVisible(true);
         ui->playOrPauseButton->setVisible(true);
         ui->stopButton->setVisible(true);
@@ -578,6 +602,35 @@ void MainWindow::paint_image()
     qDebug()<<"i am here"<<endl ;
     videoWidget->update() ;
 }
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->setDropAction(Qt::MoveAction);
+    event->accept();
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    QString str = event->mimeData()->text() ;
+    //qDebug()<<event->mimeData()->text()<<endl;
+    str.remove(0, 8) ;
+    qDebug()<<str<<endl ;
+    QFileInfo fileInfo(str);
+    QString url = fileInfo.absoluteFilePath();
+    //qDebug()<<url<<endl ;
+    QString fileName = fileInfo.fileName();
+
+    ui->playList->addItem(fileName);
+    m_mediaPlayList->addMedia(QMediaContent(url));
+
+    QTimer::singleShot(800, this, [this](){
+        m_mediaPlayer->play();
+    });
+
+    m_nameList.append(fileName);
+    m_ulrMap[fileName] = url;
+    savePlayList();
+}
 //void MainWindow::paintEvent(QPaintEvent *event)
 //{
 //    QPainter painter(this);
@@ -587,6 +640,9 @@ void MainWindow::paint_image()
 //    painter.drawPixmap(GlobalData::qp.rx(), GlobalData::qp.ry()+300, Qpix);
 
 //}
+
+
+
 
 
 

@@ -65,6 +65,10 @@ private slots:
 
     void on_PreButton_clicked();
 
+    void on_VolumeSlider_sliderReleased();
+
+    void on_VolumeButton_clicked();
+
 private:
     void updatePlayText(bool play = true);
     void updatePlayText1(bool play = true);
@@ -81,6 +85,8 @@ private:
     void mousePressEvent(QMouseEvent * event) ;
     void HideAndExpandLayout();
 //    void paintEvent(QPaintEvent *event) ;
+    void dragEnterEvent(QDragEnterEvent *event);//拖拽进入
+    void dropEvent(QDropEvent *event) ;
 
 
 private:

@@ -138,7 +138,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QPushButton" name="VolumeButton">
         <property name="text">
          <string>音量</string>
         </property>
