@@ -27,7 +27,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    /***设置SpeedButtonBox***/
+    ui->SpeedButtonBox->setCurrentIndex(1);
+    //默认为1倍速播放
 
+    ui->SpeedButton->setVisible(false);
     this->setAcceptDrops(true); //启动拖动事件
     ui->playList->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->playPosSlider->setMaximum(5) ;
@@ -48,6 +52,22 @@ MainWindow::MainWindow(QWidget *parent)
         m_ulrMap.clear();
         m_mediaPlayList->clear();
         ui->playList->clear();
+        savePlayList();
+    });
+    contenxMenu->addAction("添加文件...", this, [this](){
+        QString path = QFileDialog::getOpenFileName();
+        QFileInfo fileInfo(path);
+        QString url = fileInfo.absoluteFilePath();
+        QString fileName = fileInfo.fileName();
+        ui->playList->addItem(fileName);
+        m_mediaPlayList->addMedia(QMediaContent(url));
+
+        QTimer::singleShot(800, this, [this](){
+            m_mediaPlayer->play();
+        });
+
+        m_nameList.append(fileName);
+        m_ulrMap[fileName] = url;
         savePlayList();
     });
 
@@ -145,18 +165,37 @@ void MainWindow::on_playList_doubleClicked(const QModelIndex &index)
     }
     QString name = ui->playList->item(index.row())->text();
     //qDebug()<<name<<endl ;
-    if (!m_ulrMap.contains(name))
-    {
-        ui->statusbar->showMessage("播放失败，没有对应的ulr地址");
-        if (QMessageBox::warning(this, "警告", "当前影视不能播放，是否删除", "是", "否") == 0)
-        {
-            m_nameList.removeAll(name);
-            m_ulrMap.remove(name);
-            ui->playList->takeItem(index.row());
-            savePlayList();
-        }
-        return ;
-    }
+
+    if (m_ulrMap.contains(name)){
+            QFile file(m_ulrMap[name]);
+            if(file.exists()){
+                ui->statusbar->showMessage("播放成功");
+            }
+            else{
+                ui->statusbar->showMessage("播放失败，没有对应的ulr地址");
+                if (QMessageBox::warning(this, "警告", "当前影视不能播放，是否删除", "是", "否") == 0)
+                {
+                    m_nameList.removeAll(name);
+                    m_ulrMap.remove(name);
+                    ui->playList->takeItem(index.row());
+                    savePlayList();
+                }
+                m_mediaPlayer->pause();
+                return ;
+            }
+      }
+//    if (!m_ulrMap.contains(name))
+//    {
+//        ui->statusbar->showMessage("播放失败，没有对应的ulr地址");
+//        if (QMessageBox::warning(this, "警告", "当前影视不能播放，是否删除", "是", "否") == 0)
+//        {
+//            m_nameList.removeAll(name);
+//            m_ulrMap.remove(name);
+//            ui->playList->takeItem(index.row());
+//            savePlayList();
+//        }
+//        return ;
+//    }
     m_mediaPlayList->setCurrentIndex(index.row());
 
     QTimer::singleShot(800, this, [this](){
@@ -189,27 +228,33 @@ void MainWindow::on_stopButton_clicked()
     m_mediaPlayer->stop();
 }
 
+//上一首
 void MainWindow::on_PreButton_clicked()
 {
     if(m_mediaPlayList->currentIndex()==0)
     {
         m_mediaPlayList->setCurrentIndex(m_mediaPlayList->mediaCount()-1);
+        ui->playList->setCurrentRow(m_mediaPlayList->mediaCount()-1);
         m_mediaPlayer->play();
         return ;
     }
     m_mediaPlayList->previous();
+    ui->playList->setCurrentRow(m_mediaPlayList->currentIndex());
     m_mediaPlayer->play();
 }
 
+//下一首
 void MainWindow::on_pushButton_clicked()
 {
     if(m_mediaPlayList->currentIndex()==m_mediaPlayList->mediaCount()-1)
     {
         m_mediaPlayList->setCurrentIndex(0);
+        ui->playList->setCurrentRow(0);
         m_mediaPlayer->play();
         return ;
     }
     m_mediaPlayList->next();
+    ui->playList->setCurrentRow(m_mediaPlayList->currentIndex());
     m_mediaPlayer->play();
 }
 
@@ -263,30 +308,30 @@ void MainWindow::on_PlayModeButton_clicked()
     }
 }
 
-void MainWindow::on_SpeedButton_clicked()
-{
-    qDebug()<<m_mediaPlayer->playbackRate()<<endl;
-    if(m_mediaPlayer->playbackRate()==qreal(1))
-    {
-        m_mediaPlayer->setPlaybackRate(qreal(2));
-        ui->SpeedButton->setText("x2");
-    }
-    else if(m_mediaPlayer->playbackRate()==qreal(2))
-    {
-        m_mediaPlayer->setPlaybackRate(qreal(4));
-        ui->SpeedButton->setText("x4");
-    }
-    else if(m_mediaPlayer->playbackRate()==qreal(4))
-    {
-        m_mediaPlayer->setPlaybackRate(qreal(0.5));
-        ui->SpeedButton->setText("x0.5");
-    }
-    else if(m_mediaPlayer->playbackRate()==qreal(0.5))
-    {
-        m_mediaPlayer->setPlaybackRate(qreal(1));
-        ui->SpeedButton->setText("x1");
-    }
-}
+//void MainWindow::on_SpeedButton_clicked()
+//{
+//    qDebug()<<m_mediaPlayer->playbackRate()<<endl;
+//    if(m_mediaPlayer->playbackRate()==qreal(1))
+//    {
+//        m_mediaPlayer->setPlaybackRate(qreal(2));
+//        ui->SpeedButton->setText("x2");
+//    }
+//    else if(m_mediaPlayer->playbackRate()==qreal(2))
+//    {
+//        m_mediaPlayer->setPlaybackRate(qreal(4));
+//        ui->SpeedButton->setText("x4");
+//    }
+//    else if(m_mediaPlayer->playbackRate()==qreal(4))
+//    {
+//        m_mediaPlayer->setPlaybackRate(qreal(0.5));
+//        ui->SpeedButton->setText("x0.5");
+//    }
+//    else if(m_mediaPlayer->playbackRate()==qreal(0.5))
+//    {
+//        m_mediaPlayer->setPlaybackRate(qreal(1));
+//        ui->SpeedButton->setText("x1");
+//    }
+//}
 
 void MainWindow::updatePlayText(bool play)
 {
@@ -526,6 +571,7 @@ void MainWindow::HideAndExpandLayout()
         ui->pushButton->setVisible(false);
         ui->SpeedButton->setVisible(false);
         ui->PreButton->setVisible(false);
+        ui->SpeedButtonBox->setVisible(false);
     }
     else
     {
@@ -539,8 +585,9 @@ void MainWindow::HideAndExpandLayout()
         ui->playPosLable->setVisible(true);
         ui->PlayModeButton->setVisible(true);
         ui->pushButton->setVisible(true);
-        ui->SpeedButton->setVisible(true);
+        //ui->SpeedButton->setVisible(true);
         ui->PreButton->setVisible(true);
+        ui->SpeedButtonBox->setVisible(true);
     }
 }
 
@@ -641,15 +688,20 @@ void MainWindow::dropEvent(QDropEvent *event)
 
 //}
 
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_SpeedButtonBox_activated(int index)
+{
+    qDebug()<<m_mediaPlayer->playbackRate()<<endl;
+    if(index == 0){
+        m_mediaPlayer->setPlaybackRate(qreal(0.5));
+    }
+    else if(index == 1){
+        m_mediaPlayer->setPlaybackRate(qreal(1));
+    }
+    else if(index == 2){
+        m_mediaPlayer->setPlaybackRate(qreal(2));
+    }
+    else{
+        m_mediaPlayer->setPlaybackRate(qreal(4));
+    }
+}
 

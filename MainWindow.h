@@ -69,6 +69,8 @@ private slots:
 
     void on_VolumeButton_clicked();
 
+    void on_SpeedButtonBox_activated(int index);
+
 private:
     void updatePlayText(bool play = true);
     void updatePlayText1(bool play = true);
