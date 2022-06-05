@@ -89,7 +89,7 @@ void VideoInformation::getVideoInfo(QString file_path){
     //qDebug()<<file_path<<endl ;
     avformat_close_input(&input_AVFormat_context_) ;
     input_AVFormat_context_ = avformat_alloc_context();
-    if(avformat_open_input(&input_AVFormat_context_, file_path.toLatin1().data(), 0, NULL) < 0){
+    if(avformat_open_input(&input_AVFormat_context_, file_path.toStdString().std::string::c_str(), 0, NULL) < 0){
         //std::cout<<"file open error!"<<std::endl;
         return;
     }
