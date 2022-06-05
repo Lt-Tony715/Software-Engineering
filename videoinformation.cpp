@@ -150,7 +150,7 @@ void VideoInformation::getVideoInfo(QString file_path){
             //利用编码参数对象AVCdecParamters得到视频宽度，高度，码率，视频大小
             this->width_ = codec_par->width;
             this->height_ = codec_par->height;
-            this->video_average_bit_rate_ = codec_par->bit_rate/1000;
+            this->video_average_bit_rate_ = input_AVFormat_context_->bit_rate/1000;
             //qDebug()<<codec_par->bit_rate<<endl ;
             this->video_size_ = this->video_average_bit_rate_ * secs / (8.0*1024);
 
@@ -171,7 +171,7 @@ void VideoInformation::getVideoInfo(QString file_path){
 
          //判断是否为音频流
         }else if(input_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO){
-
+            this->flag = false ;
             //生成AVcodecParamters对象
             AVCodecParameters* codec_par = input_stream->codecpar;
             AVCodecContext* avctx_audio;
@@ -183,7 +183,7 @@ void VideoInformation::getVideoInfo(QString file_path){
 
             this->audio_format_ = avcodec_get_name(avctx_audio->codec_id);
 
-            this->audio_average_bit_rate_ = codec_par->bit_rate / 1000;
+            this->audio_average_bit_rate_ = input_AVFormat_context_->bit_rate / 1000;
 
             this->channel_nums = codec_par->channels;
 
