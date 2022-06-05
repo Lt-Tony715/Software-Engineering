@@ -114,6 +114,17 @@ MainWindow::MainWindow(QWidget *parent)
         //GlobalData::vi.getVideoInfo(m_mediaPlayer)
         ui->playPosSlider->setMaximum(duration);
         ui->playPosSlider->setValue(0);
+        ui->pic->setVisible(false);
+        if(GlobalData::vi.pic_flag())
+        {
+            QImage pic("1.jpg");
+            ui->pic->setVisible(true);
+            ui->pic->setPixmap(QPixmap::fromImage(pic));;
+        }
+        else
+        {
+            ui->pic->setVisible(false);
+        }
     });
 
     connect(m_mediaPlayer, (void (QMediaPlayer::*)(QMediaPlayer::Error))&QMediaPlayer::error, this, [this](QMediaPlayer::Error error) {
@@ -569,7 +580,6 @@ void MainWindow::HideAndExpandLayout()
         ui->playPosLable->setVisible(false);
         ui->PlayModeButton->setVisible(false);
         ui->pushButton->setVisible(false);
-        ui->SpeedButton->setVisible(false);
         ui->PreButton->setVisible(false);
         ui->SpeedButtonBox->setVisible(false);
     }
@@ -584,8 +594,7 @@ void MainWindow::HideAndExpandLayout()
         ui->stopButton->setVisible(true);
         ui->playPosLable->setVisible(true);
         ui->PlayModeButton->setVisible(true);
-        ui->pushButton->setVisible(true);
-        //ui->SpeedButton->setVisible(true);
+        ui->pushButton->setVisible(true);     
         ui->PreButton->setVisible(true);
         ui->SpeedButtonBox->setVisible(true);
     }

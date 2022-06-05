@@ -1,6 +1,7 @@
 #ifndef VIDEOINFORMATION_H
 #define VIDEOINFORMATION_H
 
+#include "qimage.h"
 #include<QString>
 #include<iostream>
 #include<QFileInfo>
@@ -110,6 +111,8 @@ public:
 
     QString getname() ;
 
+    bool pic_flag();
+
 private:
     AVFormatContext* input_AVFormat_context_;
 
@@ -152,6 +155,8 @@ private:
     float audio_size_;              //音频流大小
 
     bool flag ;
+
+    bool flagpic ;                  //图片判断
 
 };
 #endif // VIDEOINFORMATION_H
