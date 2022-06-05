@@ -7,7 +7,7 @@ VideoInformation::VideoInformation()
 
     //获取动态内存
     input_AVFormat_context_ = avformat_alloc_context();
-    this->flag = false ;
+    
     //input_AVFormat_context_ = NULL;
 }
 
@@ -87,6 +87,7 @@ int VideoInformation::getChannelNumbers()
 }
 void VideoInformation::getVideoInfo(QString file_path){
     //qDebug()<<file_path<<endl ;
+    this->flag = false ;
     avformat_close_input(&input_AVFormat_context_) ;
     input_AVFormat_context_ = avformat_alloc_context();
     if(avformat_open_input(&input_AVFormat_context_, file_path.toStdString().std::string::c_str(), 0, NULL) < 0){
@@ -171,7 +172,6 @@ void VideoInformation::getVideoInfo(QString file_path){
 
          //判断是否为音频流
         }else if(input_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO){
-            this->flag = false ;
             //生成AVcodecParamters对象
             AVCodecParameters* codec_par = input_stream->codecpar;
             AVCodecContext* avctx_audio;
@@ -195,91 +195,91 @@ void VideoInformation::getVideoInfo(QString file_path){
     }
 }
 
-void VideoInformation::test1()
-{
+// void VideoInformation::test1()
+// {
 
-        AVFormatContext* pFormatCtx = input_AVFormat_context_ ;
-        int res;
-        //res = avformat_open_input(&pFormatCtx, "D:/1.mkv", nullptr, nullptr);
-        //if (res) {
-        //    return;
-        //}
-        //avformat_find_stream_info(pFormatCtx, nullptr);
-        int videoStream = -1;
-        for (int i = 0; i < pFormatCtx->nb_streams; i++) {
-            if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-                videoStream = i;
-                break;
-            }
-        }
-        if (videoStream == -1) {
-            return;
-        }
-        //AVCodecParameters
-        AVCodecParameters* pCodecCtxOrig = nullptr;
-        // Get a pointer to the codec context for the video stream
-        pCodecCtxOrig = pFormatCtx->streams[videoStream]->codecpar;
-        AVCodec* pCodec = nullptr;
-        // Find the decoder for the video stream
-        pCodec = avcodec_find_decoder(pCodecCtxOrig->codec_id);
-        if (pCodec == nullptr) {
-            fprintf(stderr, "Unsupported codec!\n");
-            return; // Codec not found
-        }
-        AVCodecContext* pCodecCtx = nullptr;
-        // Copy context
-        pCodecCtx = avcodec_alloc_context3(pCodec);
-        //if (avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
-        //    fprintf(stderr, "Couldn't copy codec context");
-        //    return 0; // Error copying codec context
-        //}
+//         AVFormatContext* pFormatCtx = input_AVFormat_context_ ;
+//         int res;
+//         //res = avformat_open_input(&pFormatCtx, "D:/1.mkv", nullptr, nullptr);
+//         //if (res) {
+//         //    return;
+//         //}
+//         //avformat_find_stream_info(pFormatCtx, nullptr);
+//         int videoStream = -1;
+//         for (int i = 0; i < pFormatCtx->nb_streams; i++) {
+//             if (pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+//                 videoStream = i;
+//                 break;
+//             }
+//         }
+//         if (videoStream == -1) {
+//             return;
+//         }
+//         //AVCodecParameters
+//         AVCodecParameters* pCodecCtxOrig = nullptr;
+//         // Get a pointer to the codec context for the video stream
+//         pCodecCtxOrig = pFormatCtx->streams[videoStream]->codecpar;
+//         AVCodec* pCodec = nullptr;
+//         // Find the decoder for the video stream
+//         pCodec = avcodec_find_decoder(pCodecCtxOrig->codec_id);
+//         if (pCodec == nullptr) {
+//             fprintf(stderr, "Unsupported codec!\n");
+//             return; // Codec not found
+//         }
+//         AVCodecContext* pCodecCtx = nullptr;
+//         // Copy context
+//         pCodecCtx = avcodec_alloc_context3(pCodec);
+//         //if (avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
+//         //    fprintf(stderr, "Couldn't copy codec context");
+//         //    return 0; // Error copying codec context
+//         //}
 
-        int ret = avcodec_parameters_to_context(pCodecCtx, pCodecCtxOrig);
+//         int ret = avcodec_parameters_to_context(pCodecCtx, pCodecCtxOrig);
 
-        // Open codec
-        if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) {
-            return;// Could not open codec
-        }
-        AVFrame* pFrameRGB = nullptr;
-        pFrameRGB = av_frame_alloc();
-        res = av_seek_frame(pFormatCtx, -1, 15 * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD);//10(second)
-        if (res < 0) {
-            return;
-        }
-        AVPacket packet;
-        while (1) {
-            av_read_frame(pFormatCtx, &packet);
-            if (packet.stream_index == videoStream) {
-                res = avcodec_send_packet(pCodecCtx, &packet);
-                int gotPicture = avcodec_receive_frame(pCodecCtx, pFrameRGB); //gotPicture = 0 success, a frame was returned
-                if (gotPicture == 0) {
-                    SwsContext* swsContext = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_RGB24,
-                        SWS_BICUBIC, nullptr, nullptr, nullptr);
-                    //AVFrame* frameRGB = av_frame_alloc();
-                    //avpicture_alloc((AVPicture*)frameRGB, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
-                    //int num_bytes = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1);
-                    //uint8_t* buffer = (uint8_t*)av_malloc(num_bytes * sizeof(uint8_t));
-                    //av_image_fill_arrays(frameRGB->data, frameRGB->linesize, buffer, AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1);
-                    //sws_scale(swsContext, pFrameRGB->data, pFrameRGB->linesize, 0, pCodecCtx->height, frameRGB->data, frameRGB->linesize);
-                    //saveAsJPEG(pFrameRGB, pCodecCtx->width, pCodecCtx->height, 10);
-                    // 创建
-                    QImage img (pFrameRGB->width, pFrameRGB->height, QImage::Format_RGB888);
-                    uint8_t* dst[] = { img.bits() };
-                    int dstStride[4];
-                    // AV_PIX_FMT_RGB24 对应于 QImage::Format_RGB888
-                    av_image_fill_linesizes(dstStride, AV_PIX_FMT_RGB24, pFrameRGB->width);
-                    // 转换
-                    sws_scale(swsContext, pFrameRGB->data, (const int*)pFrameRGB->linesize,
-                        0, pCodecCtx->height, dst, dstStride);
-                    //qDebug()<<img<<endl ;
-                    img.save("1.jpg") ;
-                    GlobalData::qi = img ;
-                    //avformat_close_input(&pFormatCtx);
-                    return;
-                }
-            }
-        }
-}
+//         // Open codec
+//         if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) {
+//             return;// Could not open codec
+//         }
+//         AVFrame* pFrameRGB = nullptr;
+//         pFrameRGB = av_frame_alloc();
+//         res = av_seek_frame(pFormatCtx, -1, 15 * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD);//10(second)
+//         if (res < 0) {
+//             return;
+//         }
+//         AVPacket packet;
+//         while (1) {
+//             av_read_frame(pFormatCtx, &packet);
+//             if (packet.stream_index == videoStream) {
+//                 res = avcodec_send_packet(pCodecCtx, &packet);
+//                 int gotPicture = avcodec_receive_frame(pCodecCtx, pFrameRGB); //gotPicture = 0 success, a frame was returned
+//                 if (gotPicture == 0) {
+//                     SwsContext* swsContext = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_RGB24,
+//                         SWS_BICUBIC, nullptr, nullptr, nullptr);
+//                     //AVFrame* frameRGB = av_frame_alloc();
+//                     //avpicture_alloc((AVPicture*)frameRGB, AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+//                     //int num_bytes = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1);
+//                     //uint8_t* buffer = (uint8_t*)av_malloc(num_bytes * sizeof(uint8_t));
+//                     //av_image_fill_arrays(frameRGB->data, frameRGB->linesize, buffer, AV_PIX_FMT_YUV420P, pCodecCtx->width, pCodecCtx->height, 1);
+//                     //sws_scale(swsContext, pFrameRGB->data, pFrameRGB->linesize, 0, pCodecCtx->height, frameRGB->data, frameRGB->linesize);
+//                     //saveAsJPEG(pFrameRGB, pCodecCtx->width, pCodecCtx->height, 10);
+//                     // 创建
+//                     QImage img (pFrameRGB->width, pFrameRGB->height, QImage::Format_RGB888);
+//                     uint8_t* dst[] = { img.bits() };
+//                     int dstStride[4];
+//                     // AV_PIX_FMT_RGB24 对应于 QImage::Format_RGB888
+//                     av_image_fill_linesizes(dstStride, AV_PIX_FMT_RGB24, pFrameRGB->width);
+//                     // 转换
+//                     sws_scale(swsContext, pFrameRGB->data, (const int*)pFrameRGB->linesize,
+//                         0, pCodecCtx->height, dst, dstStride);
+//                     //qDebug()<<img<<endl ;
+//                     img.save("1.jpg") ;
+//                     GlobalData::qi = img ;
+//                     //avformat_close_input(&pFormatCtx);
+//                     return;
+//                 }
+//             }
+//         }
+// }
 
 bool VideoInformation::r_flag()
 {
