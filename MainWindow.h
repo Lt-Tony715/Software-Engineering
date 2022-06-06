@@ -61,7 +61,7 @@ private slots:
 
     void on_pushButton_clicked();
 
-    void on_SpeedButton_clicked();
+    //void on_SpeedButton_clicked();
 
     void on_PreButton_clicked();
 
@@ -70,6 +70,8 @@ private slots:
     void on_VolumeButton_clicked();
 
     void on_SpeedButtonBox_activated(int index);
+
+    void on_pushButton_4_clicked();
 
 private:
     void updatePlayText(bool play = true);

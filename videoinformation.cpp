@@ -137,9 +137,10 @@ void VideoInformation::getVideoInfo(QString file_path){
          //std::cout<<"ddd: "<<lang->value<<std::endl;
         //判断是否为视频流
         if(input_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO){
+            //if(this->flagpic ==true)break;
 
             this->flag = true ;
-            //qDebug()<<"视频 "<<endl;
+            qDebug()<<"视频 "<<endl;
             //avg_frame_rate -> AVRational(有理数),
             //avg_frame_rate.num : 分子
             //avg_frame_rate.den : 母
@@ -173,7 +174,7 @@ void VideoInformation::getVideoInfo(QString file_path){
 
          //判断是否为音频流
         }else if(input_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO){
-            //qDebug()<<"音频 "<<endl;
+            qDebug()<<"音频 "<<endl;
             //生成AVcodecParamters对象
             AVCodecParameters* codec_par = input_stream->codecpar;
             AVCodecContext* avctx_audio;
@@ -183,20 +184,28 @@ void VideoInformation::getVideoInfo(QString file_path){
                 return;
             }
 
-            if (input_AVFormat_context_->iformat->read_header(input_AVFormat_context_) >= 0) {
-                for (int i = 0; i < input_AVFormat_context_->nb_streams; i++){
-                    if (input_AVFormat_context_->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC) {
-                        AVPacket pkt = input_AVFormat_context_->streams[i]->attached_pic;
-                        //使用QImage读取完整图片数据（注意，图片数据是为解析的文件数据，需要用QImage::fromdata来解析读取）
-                        QImage img = QImage::fromData((uchar*)pkt.data, pkt.size);
-                        img.save("1.jpg");
-                        this->flagpic =true;
-                        //playWidgetLayout->setPixmap(QPixmap::fromImage(img));
-                        //qDebug()<<"图片提取成功 "<<endl;
 
+            QString temp;
+            int len = this->name.size();
+            temp+=this->name[len-3];
+            temp+=this->name[len-2];
+            temp+=this->name[len-1];
+            if(temp != "mp4" && temp != "MP4"){
+                if (input_AVFormat_context_->iformat->read_header(input_AVFormat_context_) >= 0) {
+                    for (unsigned int i = 0; i < input_AVFormat_context_->nb_streams; i++){
+                        if (input_AVFormat_context_->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC) {
+                            AVPacket pkt = input_AVFormat_context_->streams[i]->attached_pic;
+                            //使用QImage读取完整图片数据（注意，图片数据是为解析的文件数据，需要用QImage::fromdata来解析读取）
+                            QImage img = QImage::fromData((uchar*)pkt.data, pkt.size);
+                            img.save("1.jpg");
+                            this->flagpic =true;
+                            //playWidgetLayout->setPixmap(QPixmap::fromImage(img));
+                            //qDebug()<<"图片提取成功 "<<endl;
+                            }
                     }
                 }
             }
+
 
 
             this->audio_format_ = avcodec_get_name(avctx_audio->codec_id);
@@ -210,7 +219,7 @@ void VideoInformation::getVideoInfo(QString file_path){
 
             this->audio_size_ = this->audio_average_bit_rate_ * secs / (8.0*1024);
             avcodec_free_context(&avctx_audio);
-            break;
+            if(this->flagpic)break;
         }
     }
 }

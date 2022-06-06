@@ -31,7 +31,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->SpeedButtonBox->setCurrentIndex(1);
     //默认为1倍速播放
 
-    ui->SpeedButton->setVisible(false);
+    ui->pushButton_2->setFlat(true);
+    ui->pushButton_3->setFlat(true);
+    ui->pushButton_2->setEnabled(false);
+    ui->pushButton_3->setEnabled(false);
+    ui->PlayModeButton->setFlat(true);
+
+    //ui->SpeedButton->setVisible(false);
     this->setAcceptDrops(true); //启动拖动事件
     ui->playList->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->playPosSlider->setMaximum(5) ;
@@ -346,12 +352,30 @@ void MainWindow::on_PlayModeButton_clicked()
 
 void MainWindow::updatePlayText(bool play)
 {
-    ui->playOrPauseButton->setText(play ? "播放" : "暂停");
+    //ui->playOrPauseButton->setText(play ? "播放" : "暂停");
+    if(play){
+        ui->playOrPauseButton->setStyleSheet("border-image:url(:new/image/play.png);"
+                                             "min-height: 30px;"
+                                             "min-width: 30px;"
+                                             "max-width: 30px;"
+                                             "max-height: 30px;");
+    }
+    else{
+        ui->playOrPauseButton->setStyleSheet("border-image:url(:new/image/stop.png);"
+                                             "min-height: 30px;"
+                                             "min-width: 30px;"
+                                             "max-width: 30px;"
+                                             "max-height: 30px;");
+    }
 }
 
 void MainWindow::on_VolumeSlider_sliderReleased()
 {
     ui->VolumeSlider->setVisible(false);
+    ui->pushButton_2->setVisible(true);
+    ui->pushButton_3->setVisible(true);
+    ui->pushButton_2->setFlat(true);
+    ui->pushButton_3->setFlat(true);
 }
 
 
@@ -360,9 +384,15 @@ void MainWindow::on_VolumeButton_clicked()
     if(ui->VolumeSlider->isVisible())
     {
         ui->VolumeSlider->setVisible(false);
+        ui->pushButton_2->setVisible(true);
+        ui->pushButton_3->setVisible(true);
+        ui->pushButton_2->setFlat(true);
+        ui->pushButton_3->setFlat(true);
     }else
     {
         ui->VolumeSlider->setVisible(true);
+        ui->pushButton_2->setVisible(false);
+        ui->pushButton_3->setVisible(false);
     }
 
 }
@@ -444,6 +474,23 @@ void MainWindow::on_forwardButton_clicked()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Escape)
+        {
+           showNormal();
+           ui->menu->menuAction()->setVisible(true);
+           ui->playPosSlider->setVisible(true);
+           ui->VolumeSlider->setVisible(true);
+           ui->forwardButton->setVisible(true);
+           ui->VolumeButton->setVisible(true);
+           ui->listButton->setVisible(true);
+           ui->playOrPauseButton->setVisible(true);
+           ui->stopButton->setVisible(true);
+           ui->playPosLable->setVisible(true);
+           ui->PlayModeButton->setVisible(true);
+           ui->pushButton->setVisible(true);
+           ui->PreButton->setVisible(true);
+           ui->SpeedButtonBox->setVisible(true);
+    }
     if(event->modifiers() == Qt::ControlModifier)
     {
         //如果是，那么再检测M键是否按下
@@ -556,13 +603,13 @@ void MainWindow::HideAndExpandPlayList()
     if(ui->playList->isVisible()==true)
     {
         ui->playList->setVisible(false);
-        ui->listButton->setText("展开");
+        //ui->listButton->setText("展开");
 
     }
     else
     {
         ui->playList->setVisible(true);
-        ui->listButton->setText("隐藏");
+        //ui->listButton->setText("隐藏");
     }
 }
 
@@ -714,3 +761,17 @@ void MainWindow::on_SpeedButtonBox_activated(int index)
     }
 }
 
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    this->setWindowFlags(Qt::Window);
+    if(isFullScreen()){
+        showNormal();
+        ui->menu->menuAction()->setVisible(true);
+    }
+    else{
+        showFullScreen();
+        ui->menu->menuAction()->setVisible(false);
+        ui->playList->setVisible(false);
+    }
+}

@@ -6,27 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>935</width>
-    <height>616</height>
+    <width>1037</width>
+    <height>654</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0" columnstretch="1,0,0">
-    <item row="0" column="2" rowspan="3">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="spacing">
-       <number>0</number>
+   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0" columnstretch="1,0,0">
+    <item row="1" column="0">
+     <widget class="QLabel" name="pic">
+      <property name="text">
+       <string/>
       </property>
-      <property name="bottomMargin">
-       <number>11</number>
-      </property>
-      <item>
-       <widget class="QListWidget" name="playList"/>
-      </item>
-     </layout>
+     </widget>
     </item>
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -52,13 +49,6 @@
       </item>
      </layout>
     </item>
-    <item row="7" column="2">
-     <widget class="QPushButton" name="SpeedButton">
-      <property name="text">
-       <string>x1</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
@@ -83,52 +73,269 @@
       </layout>
      </widget>
     </item>
-    <item row="3" column="0" colspan="3">
+    <item row="0" column="2" rowspan="3">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>11</number>
+      </property>
+      <item>
+       <widget class="QListWidget" name="playList"/>
+      </item>
+     </layout>
+    </item>
+    <item row="4" column="0" colspan="3">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>0</number>
       </property>
       <item>
-       <widget class="QPushButton" name="PreButton">
+       <widget class="QPushButton" name="stopButton">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/recycle.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
         <property name="text">
-         <string>上一首</string>
+         <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_12">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_13">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="PreButton">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/previous.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_9">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="playOrPauseButton">
         <property name="text">
-         <string>播放</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="stopButton">
-        <property name="text">
-         <string>停止</string>
+       <spacer name="horizontalSpacer_10">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/next.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
         <property name="text">
-         <string>下一首</string>
+         <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="forwardButton">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/speed.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
         <property name="text">
-         <string>快进</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="PlayModeButton">
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="VolumeButton">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/voice.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
         <property name="text">
-         <string>列表循环</string>
+         <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="myslider" name="VolumeSlider">
+        <property name="styleSheet">
+         <string notr="true">max-width:82px</string>
+        </property>
+        <property name="singleStep">
+         <number>5</number>
+        </property>
+        <property name="pageStep">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <number>50</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="styleSheet">
+         <string notr="true">background-color:(79,79,79,100);
+min-width: 41px;  
+max-width: 41px; 
+max-height: 30px;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_7">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QComboBox" name="SpeedButtonBox">
@@ -184,32 +391,49 @@ QComboBox {
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="listButton">
-        <property name="text">
-         <string>隐藏</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="VolumeButton">
-        <property name="text">
-         <string>音量</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="myslider" name="VolumeSlider">
-        <property name="singleStep">
-         <number>5</number>
-        </property>
-        <property name="pageStep">
-         <number>0</number>
-        </property>
-        <property name="value">
-         <number>50</number>
-        </property>
+       <spacer name="horizontalSpacer_8">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="PlayModeButton">
+        <property name="text">
+         <string>列表循环</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_11">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/full.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -226,14 +450,21 @@ QComboBox {
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="listButton">
+        <property name="styleSheet">
+         <string notr="true">border-image:url(:/new/image/list.png);
+min-height: 30px; 
+min-width: 30px;  
+max-width: 30px; 
+max-height: 30px;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="pic">
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
     </item>
    </layout>
   </widget>
@@ -242,7 +473,7 @@ QComboBox {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>935</width>
+     <width>1037</width>
      <height>26</height>
     </rect>
    </property>
